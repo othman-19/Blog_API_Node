@@ -8,7 +8,7 @@ One backend consumed by two different front-ends for accessing and editing the b
 
 [Live Demo Link]() .
 
-![Design of the app models]()
+![Design of the app models](modelDesign.png)
 
 
 ## Built With

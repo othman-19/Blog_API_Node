@@ -24,6 +24,21 @@ exports.index = (req, res, next) => {
     });
 };
 
+// eslint-disable-next-line consistent-return
+exports.create = (req, res, next) => {
+  const errors = validationResult(req);
+
+  const post = new Post(req.body);
+
+  if (!errors.isEmpty()) {
+    return res.json(errors.array());
+  }
+
+  post.save()
+    .then(post => res.json(post))
+    .catch(err => res.json(err));
+};
+
 exports.show = (req, res, next) => {
   Post.findById({ _id: mongoose.Types.ObjectId(req.params.id) })
     .exec()

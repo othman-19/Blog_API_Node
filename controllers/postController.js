@@ -56,8 +56,21 @@ exports.update = (req, res, next) => {
 
   if (!errors.isEmpty()) return res.json({ post, errors: errors.array() });
 
-  return Post.findByIdAndUpdate(req.params.id, post, {})
+  Post.findByIdAndUpdate(req.params.id, post, {})
     .exec()
-    .then(post => res.json(post))
+    .then(post => {
+      if (!post) return next({ message: 'Post was not found.' });
+      return res.json(post);
+    })
+    .catch(err => res.json(err));
+};
+
+exports.destroy = (req, res, next) => {
+  Post.findByIdAndRemove(req.params.id)
+    .exec()
+    .then(post => {
+      if (!post) return next({ message: 'Post was not found.' });
+      return res.json(post);
+    })
     .catch(err => res.json(err));
 };

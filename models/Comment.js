@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
 
-const PostSchema = new Schema(
+const CommentShcema = new Schema(
   {
     text: {
       type: String,
@@ -37,8 +37,8 @@ const PostSchema = new Schema(
   { timestamps: true },
 );
 
-PostSchema.virtual('url').get(function () {
+CommentShcema.virtual('url').get(function () {
   return `/posts/${this._id}`;
 });
 
-module.exports = mongoose.model('Post', PostSchema);
+module.exports = mongoose.model('Post', CommentShcema);

@@ -26,8 +26,12 @@ const PostSchema = new Schema(
         lowercase: true,
         required: [true, "can't be blank"],
         match: [/\S+@\S+\.\S+/, 'is invalid'],
+        maxlength: 200,
       },
-      maxlength: 200,
+    },
+    published: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true },

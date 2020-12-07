@@ -24,17 +24,14 @@ exports.index = (req, res, next) => {
     });
 };
 
-// eslint-disable-next-line consistent-return
 exports.create = (req, res, next) => {
   const errors = validationResult(req);
 
   const post = new Post(req.body);
 
-  if (!errors.isEmpty()) {
-    return res.json(errors.array());
-  }
+  if (!errors.isEmpty()) return res.json(errors.array());
 
-  post.save()
+  return post.save()
     .then(post => res.json(post))
     .catch(err => res.json(err));
 };
@@ -43,12 +40,24 @@ exports.show = (req, res, next) => {
   Post.findById({ _id: mongoose.Types.ObjectId(req.params.id) })
     .exec()
     .then(post => {
-      if (!post) {
-        return next({ message: 'The post was not found.' });
-      }
+      if (!post) return next({ message: 'The post was not found.' });
       return res.json(post);
     })
-    .catch(err => {
-      res.json(err);
-    });
+    .catch(err => res.json(err));
+};
+
+exports.update = (req, res, next) => {
+  const errors = validationResult(req);
+
+  const post = new Post({
+    _id: req.params.id,
+    ...req.body,
+  });
+
+  if (!errors.isEmpty()) return res.json({ post, errors: errors.array() });
+
+  return Post.findByIdAndUpdate(req.params.id, post, {})
+    .exec()
+    .then(post => res.json(post))
+    .catch(err => res.json(err));
 };

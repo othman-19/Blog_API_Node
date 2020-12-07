@@ -25,4 +25,8 @@ PostSchema.virtual('url').get(function () {
   return `/posts/${this._id}`;
 });
 
+PostSchema.pre('remove', function (next) {
+  this.model('Comment').deleteMany({ post: this._id }, next);
+});
+
 module.exports = mongoose.model('Post', PostSchema);

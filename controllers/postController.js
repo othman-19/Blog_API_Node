@@ -16,12 +16,12 @@ exports.validations = [
 
 exports.index = (req, res, next) => {
   Post.find({ published: true }, 'title text createdAt')
-    .exec((err, posts) => {
-      if (err) {
-        return next(err);
-      }
-      return res.json(posts);
-    });
+    .exec()
+    .then(posts => {
+      if (!posts.length) return res.status(404).end();
+      return res.status(200).json(posts);
+    })
+    .catch(err => res.json(err));
 };
 
 exports.create = (req, res, next) => {
@@ -29,10 +29,10 @@ exports.create = (req, res, next) => {
 
   const post = new Post(req.body);
 
-  if (!errors.isEmpty()) return res.json(errors.array());
+  if (!errors.isEmpty()) return res.status(400).json(errors.array());
 
   return post.save()
-    .then(post => res.json(post))
+    .then(post => res.status(200).json(post))
     .catch(err => res.json(err));
 };
 
@@ -40,8 +40,8 @@ exports.show = (req, res, next) => {
   Post.findById({ _id: mongoose.Types.ObjectId(req.params.id) })
     .exec()
     .then(post => {
-      if (!post) return next({ message: 'The post was not found.' });
-      return res.json(post);
+      if (!post) return res.status(404).end();
+      return res.status(200).json(post);
     })
     .catch(err => res.json(err));
 };
@@ -54,13 +54,13 @@ exports.update = (req, res, next) => {
     ...req.body,
   });
 
-  if (!errors.isEmpty()) return res.json({ post, errors: errors.array() });
+  if (!errors.isEmpty()) return res.status(400).json({ post, errors: errors.array() });
 
-  Post.findByIdAndUpdate(req.params.id, post, {})
+  return Post.findByIdAndUpdate(req.params.id, post, {})
     .exec()
     .then(post => {
-      if (!post) return next({ message: 'Post was not found.' });
-      return res.json(post);
+      if (!post) return res.status(404).end();
+      return res.status(200).json(post);
     })
     .catch(err => res.json(err));
 };
@@ -69,8 +69,8 @@ exports.destroy = (req, res, next) => {
   Post.findByIdAndRemove(req.params.id)
     .exec()
     .then(post => {
-      if (!post) return next({ message: 'Post was not found.' });
-      return res.json(post);
+      if (!post) return res.status(404).end();
+      return res.status(200).json(post);
     })
     .catch(err => res.json(err));
 };

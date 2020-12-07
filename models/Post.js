@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Comment = require('./Comment');
 
 const { Schema } = mongoose;
 
@@ -26,7 +27,7 @@ PostSchema.virtual('url').get(function () {
 });
 
 PostSchema.pre('remove', function (next) {
-  this.model('Comment').deleteMany({ post: this._id }, next);
+  Comment.deleteMany({ post: this._id }, next);
 });
 
 module.exports = mongoose.model('Post', PostSchema);

@@ -18,6 +18,7 @@ const PostSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
   },
   { timestamps: true },
 );

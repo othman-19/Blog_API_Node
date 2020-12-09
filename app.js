@@ -15,3 +15,8 @@ const csrf = require('csurf');
 const rateLimit = require('express-rate-limit');
 const debug = require('debug')('members-only:');
 const compression = require('compression');
+
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/users');
+const postsRouter = require('./routes/posts');
+const commentsRouter = require('./routes/comments');

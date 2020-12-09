@@ -110,4 +110,14 @@ app.use('api/v1', indexRouter);
 app.use('api/v1/users', usersRouter);
 app.use('api/v1/posts', postsRouter);
 app.use('api/v1/comments', commentsRouter);
+
+// CSRF error handler
+app.use((err, req, res, next) => {
+  if (err.code !== 'EBADCSRFTOKEN') return next(err);
+  // handle CSRF token errors here
+  res.status(403);
+  return res.send('form tampered with');
+});
+
+
 module.exports = app;

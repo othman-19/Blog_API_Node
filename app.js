@@ -42,3 +42,31 @@ mongoose.connect(
   .catch(err => {
     debug(`update error:  ${err}`);
   });
+
+const app = express();
+
+app.use(logger('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+
+app.use(compression());
+
+app.use(helmet());
+
+app.set('trust proxy', 1);
+
+app.use(session({
+  secret,
+  resave: true,
+  saveUninitialized: true,
+  name: 'sessionId',
+  cookie: {
+    httpOnly: true,
+    // secure,
+  },
+}));
+app.use('/', indexRouter);
+app.use('/users', usersRouter);
+
+module.exports = app;

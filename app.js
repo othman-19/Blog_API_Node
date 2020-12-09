@@ -105,7 +105,9 @@ app.use(methodOverride((req, res) => {
   }
 }));
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
-
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('api/v1', indexRouter);
+app.use('api/v1/users', usersRouter);
+app.use('api/v1/posts', postsRouter);
+app.use('api/v1/comments', commentsRouter);
 module.exports = app;

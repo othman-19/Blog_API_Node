@@ -83,6 +83,14 @@ app.use(cors({
   credentials: true,
 }));
 
+const csrfProtection = csrf({ cookie: true });
+app.use(csrfProtection);
+app.use((req, res, next) => {
+  res.locals._csrf = req.csrfToken();
+  next();
+});
+
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 

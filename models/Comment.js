@@ -41,4 +41,4 @@ CommentShcema.virtual('url').get(function () {
   return `/posts/${this._id}`;
 });
 
-module.exports = mongoose.model('Post', CommentShcema);
+module.exports = mongoose.model('Comment', CommentShcema);

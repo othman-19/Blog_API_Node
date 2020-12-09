@@ -1,11 +1,11 @@
 const express = require('express');
-const path = require('path');
+// const path = require('path');
 const cookieParser = require('cookie-parser');
 const methodOverride = require('method-override');
 const logger = require('morgan');
 const mongoose = require('mongoose');
 const session = require('express-session');
-const debug = require('debug');
+const debug = require('debug')('blog-api:');
 // const flash = require('express-flash');
 // const passport = require('passport');
 const cors = require('cors');
@@ -104,7 +104,7 @@ app.use(methodOverride((req, res) => {
   }
 }));
 
-app.use(express.static(path.join(__dirname, 'public')));
+// app.use(express.static(path.join(__dirname, 'public')));
 app.use('api/v1', indexRouter);
 app.use('api/v1/users', usersRouter);
 app.use('api/v1/posts', postsRouter);

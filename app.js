@@ -1,19 +1,17 @@
-const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const methodOverride = require('method-override');
 const logger = require('morgan');
 const mongoose = require('mongoose');
-const layouts = require('express-ejs-layouts');
 const session = require('express-session');
-const flash = require('express-flash');
-const passport = require('passport');
+const debug = require('debug');
+// const flash = require('express-flash');
+// const passport = require('passport');
 const cors = require('cors');
 const helmet = require('helmet');
 const csrf = require('csurf');
 const rateLimit = require('express-rate-limit');
-const debug = require('debug')('members-only:');
 const compression = require('compression');
 
 const indexRouter = require('./routes/index');
@@ -67,7 +65,7 @@ app.use(session({
   },
 }));
 
-const allowedOrigins = ['null', 'http://localhost:3000', 'https://members-only-node.herokuapp.com'];
+const allowedOrigins = ['null', 'http://localhost:3000', 'https://blog-api-node.herokuapp.com'];
 app.use(cors({
   origin(origin, callback) {
     // allow requests with no origin
@@ -96,6 +94,7 @@ app.use(rateLimit({
   delayMs: 0, // disable delaying - user has full speed until the max limit is reached
 }));
 
+// eslint-disable-next-line consistent-return
 app.use(methodOverride((req, res) => {
   if (req.body && typeof req.body === 'object' && '_method' in req.body) {
     // look in urlencoded POST bodies and delete it
@@ -118,6 +117,5 @@ app.use((err, req, res, next) => {
   res.status(403);
   return res.send('form tampered with');
 });
-
 
 module.exports = app;

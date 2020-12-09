@@ -28,3 +28,17 @@ const {
   secure,
 } = require('./config/index');
 
+mongoose.connect(
+  database,
+  {
+    useCreateIndex: true,
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  },
+).then(() => {
+  debug('DataBase Connected');
+  debug(`app listening on port ${port}!`);
+})
+  .catch(err => {
+    debug(`update error:  ${err}`);
+  });

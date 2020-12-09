@@ -1,7 +1,6 @@
 const commentRouter = require('express').Router();
 const commentController = require('../controllers/commentController');
 
-// commentRouter.get('/new', commentController.new);
 commentRouter.get('/', commentController.index);
 
 commentRouter.get('/:id', commentController.show);

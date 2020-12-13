@@ -47,7 +47,7 @@ exports.create = (req, res, next) => {
 };
 
 exports.show = (req, res, next) => {
-  Comment.findById({ _id: mongoose.Types.ObjectId(req.params.id) })
+  Comment.findById(req.params.id)
     .exec()
     .then(comment => {
       if (!comment) return res.status(404).end();

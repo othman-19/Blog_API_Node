@@ -69,8 +69,6 @@ app.use(session({
 const allowedOrigins = ['null', 'http://localhost:3000', 'https://blog-api-node.herokuapp.com'];
 app.use(cors({
   origin(origin, callback) {
-    // allow requests with no origin
-    // (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     if (allowedOrigins.indexOf(origin) === -1) {
       const msg = 'The CORS policy for this site does not '
@@ -106,10 +104,10 @@ app.use(methodOverride((req, res) => {
 }));
 
 // app.use(express.static(path.join(__dirname, 'public')));
-app.use('api/v1', indexRouter);
-app.use('api/v1/users', usersRouter);
-app.use('api/v1/posts', postsRouter);
-app.use('api/v1/posts/:postId/comments', commentsRouter);
+app.use('/', indexRouter);
+app.use('/api/v1/users', usersRouter);
+app.use('/api/v1/posts', postsRouter);
+app.use('/api/v1/posts/:postId/comments', commentsRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

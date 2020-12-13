@@ -1,5 +1,4 @@
 const { check, validationResult } = require('express-validator');
-const mongoose = require('mongoose');
 const Post = require('../models/Post');
 
 exports.validations = [
@@ -37,7 +36,7 @@ exports.create = (req, res, next) => {
 };
 
 exports.show = (req, res, next) => {
-  Post.findById({ _id: mongoose.Types.ObjectId(req.params.id) })
+  Post.findById(req.params.id)
     .exec()
     .then(post => {
       if (!post) return res.status(404).end();

@@ -1,4 +1,5 @@
 const express = require('express');
+const createError = require('http-errors');
 // const path = require('path');
 const cookieParser = require('cookie-parser');
 const methodOverride = require('method-override');
@@ -108,7 +109,12 @@ app.use(methodOverride((req, res) => {
 app.use('api/v1', indexRouter);
 app.use('api/v1/users', usersRouter);
 app.use('api/v1/posts', postsRouter);
-app.use('api/v1/comments', commentsRouter);
+app.use('api/v1/posts/:postId/comments', commentsRouter);
+
+// catch 404 and forward to error handler
+app.use((req, res, next) => {
+  next(createError(404));
+});
 
 // CSRF error handler
 app.use((err, req, res, next) => {

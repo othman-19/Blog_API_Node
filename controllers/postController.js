@@ -14,7 +14,7 @@ exports.validations = [
 ];
 
 exports.index = (req, res, next) => {
-  Post.find({ published: true }, 'title text createdAt')
+  Post.find({ published: false }, 'title text createdAt')
     .exec()
     .then(posts => {
       if (!posts.length) return res.status(404).end();
@@ -48,27 +48,28 @@ exports.show = (req, res, next) => {
 exports.update = (req, res, next) => {
   const errors = validationResult(req);
 
-  const post = new Post({
+  const data = {
     _id: req.params.id,
     ...req.body,
-  });
+  };
 
-  if (!errors.isEmpty()) return res.status(400).json({ post, errors: errors.array() });
+  if (!errors.isEmpty()) return res.status(400).json({ data, errors: errors.array() });
 
-  return Post.findByIdAndUpdate(req.params.id, post, {})
+  return Post.findByIdAndUpdate(req.params.id, data, {})
     .exec()
     .then(post => {
       if (!post) return res.status(404).end();
-      return res.status(200).json(post);
+      return res.status(200).json(data);
     })
     .catch(err => res.json(err));
 };
 
 exports.destroy = (req, res, next) => {
-  Post.findByIdAndRemove(req.params.id)
+  Post.findById(req.params.id)
     .exec()
     .then(post => {
       if (!post) return res.status(404).end();
+      post.remove();
       return res.status(200).json(post);
     })
     .catch(err => res.json(err));

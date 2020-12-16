@@ -4,7 +4,7 @@ const router = express.Router();
 
 /* GET home page. */
 router.get('/', (req, res) => {
-  res.redirect('/api/v1');
+  res.redirect('/api/v1/welcome');
 });
 
 router.get('/api/v1/welcome', (req, res, next) => {

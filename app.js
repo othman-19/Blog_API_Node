@@ -1,6 +1,6 @@
 const express = require('express');
 const createError = require('http-errors');
-// const path = require('path');
+const path = require('path');
 const cookieParser = require('cookie-parser');
 const methodOverride = require('method-override');
 const logger = require('morgan');
@@ -11,7 +11,7 @@ const debug = require('debug')('blog-api:');
 // const passport = require('passport');
 const cors = require('cors');
 const helmet = require('helmet');
-const csrf = require('csurf');
+// const csrf = require('csurf');
 const rateLimit = require('express-rate-limit');
 const compression = require('compression');
 
@@ -46,7 +46,7 @@ const app = express();
 
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use(compression());
@@ -80,12 +80,12 @@ app.use(cors({
   credentials: true,
 }));
 
-const csrfProtection = csrf({ cookie: true });
-app.use(csrfProtection);
-app.use((req, res, next) => {
-  res.locals._csrf = req.csrfToken();
-  next();
-});
+// const csrfProtection = csrf({ cookie: true });
+// app.use(csrfProtection);
+// app.use((req, res, next) => {
+//   res.locals._csrf = req.csrfToken();
+//   next();
+// });
 
 app.use(rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -96,18 +96,18 @@ app.use(rateLimit({
 // eslint-disable-next-line consistent-return
 app.use(methodOverride((req, res) => {
   if (req.body && typeof req.body === 'object' && '_method' in req.body) {
-    // look in urlencoded POST bodies and delete it
     const method = req.body._method;
     delete req.body._method;
     return method;
   }
 }));
 
-// app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
+app.use('/api/v1', (req, res, next) => next());
 app.use('/api/v1/users', usersRouter);
 app.use('/api/v1/posts', postsRouter);
-app.use('/api/v1/posts/:postId/comments', commentsRouter);
+app.use('/api/v1/posts', commentsRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
@@ -117,9 +117,7 @@ app.use((req, res, next) => {
 // CSRF error handler
 app.use((err, req, res, next) => {
   if (err.code !== 'EBADCSRFTOKEN') return next(err);
-  // handle CSRF token errors here
-  res.status(403);
-  return res.send('form tampered with');
+  return res.status(403).send('form tampered with');
 });
 
 module.exports = app;

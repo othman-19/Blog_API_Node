@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
 
-const CommentShcema = new Schema(
+const CommentSchema = new Schema(
   {
     text: {
       type: String,
@@ -29,16 +29,22 @@ const CommentShcema = new Schema(
         maxlength: 200,
       },
     },
-    published: {
-      type: Boolean,
-      default: false,
-    },
   },
   { timestamps: true },
 );
 
-CommentShcema.virtual('url').get(function () {
+CommentSchema.virtual('url').get(function () {
   return `/posts/${this._id}`;
 });
 
-module.exports = mongoose.model('Comment', CommentShcema);
+CommentSchema.post('save', function (next) {
+  this.model('Post')
+    .update(
+      { $push: { comments: this._id } },
+    )
+    .exec()
+    .then(updatedPost => next(updatedPost))
+    .catch(err => next(err));
+});
+
+module.exports = mongoose.model('Comment', CommentSchema);

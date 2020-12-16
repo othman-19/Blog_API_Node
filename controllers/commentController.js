@@ -1,5 +1,4 @@
 const { check, validationResult } = require('express-validator');
-const mongoose = require('mongoose');
 const Comment = require('../models/Comment');
 
 exports.validations = [
@@ -18,7 +17,7 @@ exports.validations = [
 ];
 
 exports.index = (req, res, next) => {
-  Comment.find({ published: true }, 'text commenter createdAt')
+  Comment.find('text commenter createdAt')
     .exec()
     .then(comments => {
       if (!comments.length) return res.status(404).end();
@@ -29,14 +28,13 @@ exports.index = (req, res, next) => {
 
 exports.create = (req, res, next) => {
   const errors = validationResult(req);
-
   const comment = new Comment({
     text: req.body.text,
     commenter: {
       name: req.body.name,
       email: req.body.email,
     },
-    post: mongoose.Types.ObjectId(req.params.postId),
+    post: req.params.postId,
   });
 
   if (!errors.isEmpty()) return res.status(400).json(errors.array());
@@ -55,23 +53,25 @@ exports.show = (req, res, next) => {
     })
     .catch(err => res.json(err));
 };
-
 exports.update = (req, res, next) => {
   const errors = validationResult(req);
 
-  const comment = new Comment({
-    _id: mongoose.Types.ObjectId(req.params.id),
-    post: mongoose.Types.ObjectId(req.params.postId),
-    ...req.body,
-  });
+  const data = {
+    text: req.body.text,
+    commenter: {
+      name: req.body.name,
+      email: req.body.email,
+    },
+    _id: req.params.id,
+  };
 
-  if (!errors.isEmpty()) return res.status(400).json({ comment, errors: errors.array() });
+  if (!errors.isEmpty()) return res.status(400).json({ data, errors: errors.array() });
 
-  return Comment.findByIdAndUpdate(req.params.id, comment, {})
+  return Comment.findByIdAndUpdate(req.params.id, data, {})
     .exec()
     .then(comment => {
       if (!comment) return res.status(404).end();
-      return res.status(200).json(comment);
+      return res.status(200).json(data);
     })
     .catch(err => res.json(err));
 };

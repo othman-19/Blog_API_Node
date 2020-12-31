@@ -1,26 +1,22 @@
+/* eslint-disable consistent-return */
 const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const router = express.Router();
 const User = require('../models/User');
 
-/* GET users listing. */
-router.get('/me', (req, res, next) => {
-  res.send('Othmane Namani');
-});
-
 router.post('/signup', (req, res, next) => {
   User.find({ email: req.body.email })
     .exec()
-    // eslint-disable-next-line consistent-return
     .then(user => {
       if (user.length >= 1) {
         return res.status(409).json({
           message: 'Mail exists',
         });
       }
-      // eslint-disable-next-line consistent-return
+
       bcrypt.hash(req.body.password, 10, (err, hash) => {
         if (err) {
           return res.status(500).json({
@@ -41,6 +37,43 @@ router.post('/signup', (req, res, next) => {
           }));
       });
     });
+});
+
+router.post('login', (req, res, next) => {
+  User.findOne({ email: req.body.email })
+    .exec()
+    .then(user => {
+      if (!user) {
+        return res.status(401).json({
+          message: 'Auth failed',
+        });
+      }
+      bcrypt.compare(
+        req.body.password,
+        user.password,
+        (err, result) => {
+          if (err) {
+            return res.status(401).json({
+              message: 'Auth failed',
+            });
+          }
+          if (result) {
+            const token = jwt.sign(
+              { email: user.email, userId: user._id },
+              'JWT_SECRET',
+              { expiresIn: '1h' },
+            );
+            return res.status(200).json({
+              message: 'Auth successful',
+              token,
+            });
+          }
+        },
+      );
+    })
+    .catch(err => res.status(500).json({
+      error: err,
+    }));
 });
 
 router.delete('/:userId', (req, res, next) => {

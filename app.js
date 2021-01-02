@@ -5,7 +5,7 @@ const cookieParser = require('cookie-parser');
 const methodOverride = require('method-override');
 const logger = require('morgan');
 const mongoose = require('mongoose');
-const session = require('express-session');
+// const session = require('express-session');
 const debug = require('debug')('blog-api:');
 // const flash = require('express-flash');
 // const passport = require('passport');
@@ -23,9 +23,11 @@ const commentsRouter = require('./routes/comments');
 const {
   database,
   port,
-  secret,
-  secure,
+  // secret,
+  // secure,
 } = require('./config/index');
+
+const jwtAuth = require('./config/auth');
 
 mongoose.connect(
   database,
@@ -55,16 +57,16 @@ app.use(helmet());
 
 app.set('trust proxy', 1);
 
-app.use(session({
-  secret,
-  resave: true,
-  saveUninitialized: true,
-  name: 'sessionId',
-  cookie: {
-    httpOnly: true,
-    secure,
-  },
-}));
+// app.use(session({
+//   secret,
+//   resave: true,
+//   saveUninitialized: true,
+//   name: 'sessionId',
+//   cookie: {
+//     httpOnly: true,
+//     secure,
+//   },
+// }));
 
 const allowedOrigins = ['null', 'http://localhost:3000', 'https://blog-api-node.herokuapp.com'];
 app.use(cors({
@@ -104,10 +106,9 @@ app.use(methodOverride((req, res) => {
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
-app.use('/api/v1', (req, res, next) => next());
 app.use('/api/v1/users', usersRouter);
-app.use('/api/v1/posts', postsRouter);
-app.use('/api/v1/posts', commentsRouter);
+app.use('/api/v1/posts', jwtAuth, postsRouter);
+app.use('/api/v1/posts', jwtAuth, commentsRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

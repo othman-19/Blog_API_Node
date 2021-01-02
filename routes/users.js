@@ -1,17 +1,21 @@
 /* eslint-disable consistent-return */
 const express = require('express');
-const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { jwtSecret } = require('../config/index');
 
 const router = express.Router();
 const User = require('../models/User');
 
+router.get('/me', (req, res, next) => res.status(200).json(
+  { message: 'Othmane Namani' },
+));
+
 router.post('/signup', (req, res, next) => {
-  User.find({ email: req.body.email })
+  User.findOne({ email: req.body.email })
     .exec()
     .then(user => {
-      if (user.length >= 1) {
+      if (user) {
         return res.status(409).json({
           message: 'Mail exists',
         });
@@ -24,7 +28,8 @@ router.post('/signup', (req, res, next) => {
           });
         }
         const user = new User({
-          _id: new mongoose.Types.ObjectId(),
+          firstName: req.body.firstName,
+          lastName: req.body.lastName,
           email: req.body.email,
           password: hash,
         });
@@ -39,7 +44,7 @@ router.post('/signup', (req, res, next) => {
     });
 });
 
-router.post('login', (req, res, next) => {
+router.post('/login', (req, res, next) => {
   User.findOne({ email: req.body.email })
     .exec()
     .then(user => {
@@ -60,7 +65,7 @@ router.post('login', (req, res, next) => {
           if (result) {
             const token = jwt.sign(
               { email: user.email, userId: user._id },
-              'JWT_SECRET',
+              jwtSecret,
               { expiresIn: '1h' },
             );
             return res.status(200).json({
